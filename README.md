@@ -1,6 +1,6 @@
 # nextcli
 
-> 下一代 Python 多 agent 编码助手 CLI。**实时可视化** Planner / Explorer / Implementer / Reviewer 并行协作，让 AI 写代码的过程从"黑盒"变成"白盒"。
+> Next-generation Python AI CLI. **Visualises** Planner / Explorer / Implementer / Reviewer working in parallel, so writing code with AI stops being a black box.
 
 ```
 +-------------------+--------------------------------+
@@ -19,36 +19,43 @@
 +-----------------------------------------------------+
 ```
 
-## 特性 (Features)
+## Features
 
-- **多 agent 协同**：Planner / Explorer / Implementer / Reviewer 等角色并行工作，全程在 Agent Board 中可见。
-- **彩色 trace 输出**：每个文件读写、shell 命令都按发起 agent 的角色着色（左侧色条），一眼看清谁在做什么。
-- **离线 mock 模式**：无需任何 API key 即可体验完整的 4 agent 协作流程，方便快速预览与测试。
-- **Textual TUI 界面**：全屏终端 UI，支持鼠标、键盘、可滚动、可搜索，Windows Terminal / macOS Terminal / Linux 终端开箱即用。
-- **多 LLM provider**：内置 Anthropic、OpenAI、Mock、自定义（OpenAI 兼容）四种 provider，可通过环境变量或 CLI 参数切换。
-- **工具集完备**：`read` / `write` / `edit` / `shell` / `glob` / `grep` / `spawn_agent`，覆盖日常编码场景。
-- **会话持久化**：支持保存与恢复会话，便于回溯与续作。
-- **headless 模式**：`--plain` + `--task` 可在 CI / 脚本中无 TUI 运行。
+- **Multi-agent by default** — Planner, Explorer, Implementer and Reviewer run in parallel; every agent is live on the Agent Board at all times.
+- **Color-coded tool trace** — every file read/write and shell call is attributed to the agent that issued it, with a coloured left border.
+- **Works offline** — `NEXTCLI_USE_MOCK=1` runs the full four-agent flow with canned responses, no API key required.
+- **Built on Textual** — full-screen TUI, mouse-friendly, scrollable, and tested on Windows Terminal, macOS Terminal and Linux.
+- **Multiple LLM providers** — Anthropic, OpenAI, Mock, and any OpenAI-compatible Custom endpoint. Switch via env var, config file or CLI flag.
+- **Toolset** — `read_file`, `write_file`, `edit_file`, `run_shell`, `glob_files`, `grep`, and the meta-tool `spawn_agent`.
+- **Live context-window meter** — the title bar shows current/peak token usage and a coloured fill rate against the model's window (default 1M tokens).
+- **Live cost meter** — input/output tokens × Claude Opus 4-6 pricing, updated as the run progresses.
+- **Code-write diff** — every `edit_file` and `write_file` is rendered with syntax-highlighted unified diffs / previews.
+- **Slash-command palette** — type `/` to get a ClaudeCode-style command picker with descriptions and aliases (`/resume`, `/config`, `/clear`, `/help`).
+- **Session resume** — every run is saved to `~/.next-cli/sessions/<workspace>_<timestamp>.json`; `/resume` opens a bottom drawer to search, pick, and re-enter a past session.
+- **Workspace-scoped sessions** — file names include a slug of the current working directory so different projects never collide.
+- **Sub-agent detail view** — double-click any agent on the board to open its full message history in a modal.
+- **Headless mode** — `nextcli --plain --task "..."` runs without TUI for CI / scripting.
+- **Onboarding wizard** — first run captures provider, API key, base URL and model in a 4-step Textual ModalScreen.
 
-## 为什么选择 nextcli (Why nextcli)
+## Why nextcli
 
-| 其他 CLI | nextcli |
+| Other CLIs | nextcli |
 | --- | --- |
-| 单 agent 串行执行 | 多 agent 并行，Plan / Explore / Implement / Review 同步进行 |
-| 工具调用是黑盒日志 | 工具调用带角色色条，谁调的、结果如何一目了然 |
-| 必须配置 API key | 自带 Mock provider，零配置即可演示 |
-| 纯命令行 / 纯 TUI 二选一 | 交互式 TUI + headless 模式皆可，CI 友好 |
+| Single agent, serial execution | Four agents running in parallel: Plan / Explore / Implement / Review |
+| Tool calls are a black-box log | Tool calls are colour-banded by agent — who did what is obvious |
+| API key required from minute one | Mock provider gives you the full demo in 1 second, no key needed |
+| TUI *or* CLI, pick one | Both: interactive TUI for humans, `--plain` for CI |
+| Lose every session when the process exits | Every run auto-saved, searchable, resumable from `/resume` |
+| Hidden context window | Live token / cost / context-window meter in the title bar |
 
-nextcli 的目标是**让你真正"看到" AI 在做什么**——而不是只能看最终结果。
+## Installation
 
-## 安装 (Installation)
-
-### 前置要求
+### Requirements
 
 - Python **3.11+**
-- 推荐使用虚拟环境
+- A virtual environment is recommended
 
-### 方式一：从源码安装（推荐）
+### From source (recommended for development)
 
 ```bash
 git clone <your-repo-url> nextcli
@@ -58,170 +65,178 @@ source .venv/bin/activate   # Windows PowerShell: .venv\Scripts\Activate.ps1
 pip install -e ".[dev]"
 ```
 
-### 方式二：直接 pip install
+### From PyPI (when published)
 
 ```bash
 pip install nextcli
 ```
 
-> Windows 用户请把 `source .venv/bin/activate` 替换为 `.venv\Scripts\activate`。
+## Quick start
 
-## 快速开始 (Quick Start)
-
-### 1. 离线体验（无需 API key）
-
-最快的方式是先用 mock provider 跑一遍：
+### 1. Try it offline (no API key)
 
 ```bash
 NEXTCLI_USE_MOCK=1 nextcli
 ```
 
-启动后输入任务，例如：
+Type a task when prompted, for example:
 
 ```
 Refactor tests/fixtures/sample_repo/example.py to use dataclasses and add tests
 ```
 
-约 1 秒内你会看到 4 个 agent 同时上线，工具调用按角色着色，Chat Log 中流式输出最终答复。
+Within ~1 second you will see four agents spin up, colour-coded tool traces, and a final answer streamed into the chat log.
 
-### 2. 配置真实 LLM
-
-复制示例环境变量文件并填入你的 key：
-
-```bash
-cp .env.example .env
-```
-
-编辑 `.env`：
-
-```bash
-# Provider 选择：anthropic | openai | mock | custom
-NEXTCLI_PROVIDER=anthropic
-
-NEXTCLI_ANTHROPIC_API_KEY=sk-ant-...
-# NEXTCLI_OPENAI_API_KEY=sk-...
-
-NEXTCLI_ANTHROPIC_MODEL=claude-sonnet-4-5
-NEXTCLI_OPENAI_MODEL=gpt-4o
-```
-
-也可通过环境变量直接传入（适合临时使用）：
+### 2. Use a real LLM
 
 ```bash
 export NEXTCLI_ANTHROPIC_API_KEY=sk-ant-...
 nextcli
 ```
 
-启动后即可使用真实模型。
+On first launch the 4-step onboarding wizard will offer to save the key to `~/.next-cli/config.json`.
 
-### 3. 自定义 Provider（OpenAI 兼容）
+### 3. Custom (OpenAI-compatible) provider
 
 ```bash
-NEXTCLI_PROVIDER=custom
-NEXTCLI_CUSTOM_API_KEY=your-key
-NEXTCLI_CUSTOM_BASE_URL=https://your-endpoint/v1
-NEXTCLI_CUSTOM_MODEL=your-model-name
+export NEXTCLI_PROVIDER=custom
+export NEXTCLI_CUSTOM_API_KEY=sk-...
+export NEXTCLI_CUSTOM_BASE_URL=https://openrouter.ai/api/v1
+export NEXTCLI_CUSTOM_MODEL=anthropic/claude-sonnet-4-5
 nextcli
 ```
 
-## 使用方法 (Usage)
-
-### 启动 TUI
+## Usage
 
 ```bash
-nextcli                                 # 使用默认 provider（来自 .env / 环境变量）
-nextcli --provider mock                 # 临时切换为 mock
-NEXTCLI_USE_MOCK=1 nextcli              # 等价于 --provider mock
+nextcli                       # use the default provider (env / .env / config.json)
+nextcli --provider mock       # override to mock for this run
+NEXTCLI_USE_MOCK=1 nextcli    # same as above
 ```
 
-### headless 模式（无 TUI，适合 CI / 脚本）
+### Slash commands
 
-```bash
-nextcli --plain --task "add docstring to foo.py and run pytest"
-```
+Type `/` in the input bar to open the command palette. Use ↑/↓ to navigate, Enter to run, Tab to complete.
 
-事件会按行打印到 stdout，便于管道与日志收集。
+| Command | Description | Aliases |
+| --- | --- | --- |
+| `/resume` | Browse and resume a past session for this workspace | `/sessions` |
+| `/config` | Reconfigure provider, API key, or model | `/setup`, `/onboard` |
+| `/clear` | Clear chat, board and trace panes | |
+| `/help` | List all commands and keybindings | |
 
-### 常用参数
+### Keybindings
 
-| 参数 | 说明 |
+| Key | Action |
 | --- | --- |
-| `--provider {anthropic,openai,mock}` | 临时覆盖 `NEXTCLI_PROVIDER` |
-| `--plain` | 关闭 TUI，使用纯文本输出 |
-| `--task "..."` | 与 `--plain` 配合，单任务执行后退出 |
-| `--help` | 查看完整帮助 |
+| `Enter` (input bar) | Submit the current task |
+| `Ctrl+C` | Quit |
+| `Ctrl+R` | Reopen the configuration wizard |
+| `Esc` (while palette is open) | Close the palette |
+| Double-click an agent pill | Open that agent's full message history |
 
-## 架构 (Architecture)
+### Headless mode
+
+```bash
+nextcli --plain --task "add docstrings and run pytest"
+```
+
+Events are printed to stdout, one per line, suitable for piping and CI logs.
+
+## Architecture
 
 ```
 src/nextcli/
-├── agent/          # agent 事件循环、角色 prompts、事件总线
-├── llm/            # LLMProvider 协议 + Anthropic / OpenAI / Mock / Custom 实现
-├── tools/          # 工具基类 + read/write/edit/shell/glob/grep/spawn_agent
-├── orchestrator/   # Planner、fan-out / gather / merge、Runner
-├── tui/            # Textual App、四象限布局、状态板、命令面板
-├── util/           # 日志、路径等通用工具
-├── cli.py          # 命令行入口
-├── config.py       # env / .env / ~/.next-cli/config.json 三层配置合并
-└── __main__.py     # `python -m nextcli` 入口
+├── agent/          # agent event loop, role prompts, event bus
+├── llm/            # LLMProvider protocol + Anthropic / OpenAI / Mock / Custom
+├── tools/          # tool base + read / write / edit / shell / glob / grep / spawn_agent
+├── orchestrator/   # Planner, fan-out / gather / merge, Runner
+├── tui/            # Textual app, panes, command palette, resume drawer
+├── util/           # logging, paths
+├── cli.py          # CLI entry point
+├── config.py       # env / .env / config.json three-layer merge
+└── __main__.py     # `python -m nextcli` entry
 ```
 
-各模块职责：
+| Module | Responsibility |
+| --- | --- |
+| `agent/` | `AgentEvent` / `EventBus` / `Agent.run()` loop and one system prompt per role. |
+| `llm/` | Single `LLMProvider` protocol with a streaming `stream()` method; concrete adapters translate vendor-specific tool schemas. |
+| `tools/` | `Tool` protocol, `ToolRegistry` with per-role allowlists, and the seven built-in tools. |
+| `orchestrator/` | Spawns sub-agents from the planner's tool calls, gathers their final outputs, then re-invokes the planner with a summary prompt so it can write a final answer. |
+| `tui/` | `NextCliApp`, `AgentBoard`, `ChatLog`, `ToolTrace`, `InputBar`, `CommandPalette`, `ResumeScreen`, `SessionViewerScreen`, `AgentDetailScreen`, `OnboardingScreen`. |
+| `util/` | `paths.py` (workspace slug, project-root resolution), `log.py`. |
 
-- **agent/**：定义 agent 事件、事件循环、每个角色（planner/explorer/implementer/reviewer）的 system prompt。
-- **llm/**：抽象 `LLMProvider` 协议，向上提供统一的 `stream()` 接口；向下适配 Anthropic / OpenAI / Mock / 自定义 OpenAI 兼容端点。
-- **tools/**：工具协议 + 默认注册表；agent 通过工具读写文件、执行 shell、搜索代码、生成子 agent。
-- **orchestrator/**：负责把用户的复杂任务拆给多个 agent（planner → fan-out → gather → merge），并归并结果。
-- **tui/**：基于 Textual 的终端 UI，Agent Board / Chat Log / Tool Trace / 输入框四象限，鼠标键盘均可操作。
-- **util/**：日志、路径等横切关注点。
+### Context window
 
-## 运行测试 (Running Tests)
+The title bar's `ctx` segment is driven by `_CONTEXT_WINDOWS` in `tui/app.py`:
 
-测试使用 pytest，**不需要任何 API key**（默认走 mock）：
+| Model | Window |
+| --- | --- |
+| `claude-opus-4-8`, `claude-opus-4-6`, `claude-sonnet-4-5`, `claude-sonnet-4-6` | 1,000,000 |
+| `claude-haiku-4-5`, `o1`, `o3-mini` | 200,000 |
+| `gpt-4o`, `gpt-4o-mini` | 128,000 |
+| Anything else | 1,000,000 (default) |
+
+The cost is computed at Opus 4-6 list price: **$15 / 1M input tokens**, **$75 / 1M output tokens**.
+
+## Configuration
+
+Configuration is merged with the following precedence (higher wins):
+
+1. Environment variables
+2. Project-root `.env` (loaded by `python-dotenv`)
+3. `~/.next-cli/config.json` (persisted by the onboarding wizard)
+
+### Environment variables
+
+| Variable | Purpose | Default |
+| --- | --- | --- |
+| `NEXTCLI_PROVIDER` | `anthropic` / `openai` / `mock` / `custom` | `anthropic` |
+| `NEXTCLI_USE_MOCK` | Truthy values (`1` / `true` / `yes` / `on`) force mock mode | `0` |
+| `NEXTCLI_ANTHROPIC_API_KEY` | Anthropic API key | — |
+| `NEXTCLI_OPENAI_API_KEY` | OpenAI API key | — |
+| `NEXTCLI_CUSTOM_API_KEY` | Custom (OpenAI-compatible) provider key | — |
+| `NEXTCLI_CUSTOM_BASE_URL` | Custom provider base URL | — |
+| `NEXTCLI_ANTHROPIC_MODEL` | Anthropic model name | `claude-sonnet-4-5` |
+| `NEXTCLI_OPENAI_MODEL` | OpenAI model name | `gpt-4o` |
+| `NEXTCLI_CUSTOM_MODEL` | Custom provider model name | — |
+
+See `.env.example` for a complete template.
+
+### Session files
+
+Every completed run writes one JSON file:
+
+```
+~/.next-cli/sessions/<workspace-slug>_<YYYY-MM-DD_HH-MM-SS>.json
+```
+
+Where `<workspace-slug>` is the working-directory path with non-alphanumeric characters replaced by `-` (e.g. `D:/31702/next-ai-cli` → `D-31702-next-ai-cli`). This keeps projects isolated.
+
+## Running tests
 
 ```bash
 pip install -e ".[dev]"
 pytest -q
 ```
 
-`pyproject.toml` 已配置 `asyncio_mode = auto`，异步测试无需手动装饰。
+All tests use the mock provider, so no API key is required. `pyproject.toml` already sets `asyncio_mode = auto`.
 
-## 配置 (Configuration)
+## Contributing
 
-配置按以下优先级合并（高优先级覆盖低优先级）：
+1. Fork the repo and create a feature branch: `git checkout -b feat/your-feature`
+2. Install dev dependencies: `pip install -e ".[dev]"`
+3. Make your change and add tests
+4. Make sure `pytest -q` is green before pushing
+5. Open a Pull Request describing motivation and behaviour changes
 
-1. **环境变量**（最高）
-2. **项目根目录 `.env`**（由 `python-dotenv` 加载）
-3. **`~/.next-cli/config.json`**（用户级持久化配置）
+Larger changes should be discussed in an issue first. Match the existing module layout and type-hint style.
 
-### 支持的环境变量
+## License
 
-| 变量 | 说明 | 默认值 |
-| --- | --- | --- |
-| `NEXTCLI_PROVIDER` | `anthropic` / `openai` / `mock` / `custom` | `anthropic` |
-| `NEXTCLI_USE_MOCK` | 任意真值（`1`/`true`/`yes`/`on`）强制走 mock | `0` |
-| `NEXTCLI_ANTHROPIC_API_KEY` | Anthropic API key | — |
-| `NEXTCLI_OPENAI_API_KEY` | OpenAI API key | — |
-| `NEXTCLI_CUSTOM_API_KEY` | 自定义 provider API key | — |
-| `NEXTCLI_CUSTOM_BASE_URL` | 自定义 provider Base URL（OpenAI 兼容） | — |
-| `NEXTCLI_ANTHROPIC_MODEL` | Anthropic 模型名 | `claude-sonnet-4-5` |
-| `NEXTCLI_OPENAI_MODEL` | OpenAI 模型名 | `gpt-4o` |
-| `NEXTCLI_CUSTOM_MODEL` | 自定义 provider 模型名 | — |
+MIT. See `pyproject.toml` for the SPDX identifier.
 
-> 完整字段可参考项目根目录的 `.env.example`。
+---
 
-## 贡献 (Contributing)
-
-欢迎贡献！建议流程：
-
-1. Fork 本仓库并创建特性分支：`git checkout -b feat/your-feature`
-2. 安装开发依赖：`pip install -e ".[dev]"`
-3. 修改代码并补充测试：`pytest -q`
-4. 提交前确保测试通过、commit message 清晰
-5. 发起 Pull Request，描述动机与变更点
-
-大的功能变更建议先开 issue 讨论设计。代码风格遵循现有目录的惯例（`ruff` / `black` 配置可在后续补充）。
-
-## 许可证 (License)
-
-本项目使用 **MIT License**，详见 `pyproject.toml` 中的 `license` 字段。
+🌐 Other languages: [简体中文](README-zh-CN.md)
