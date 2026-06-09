@@ -9,7 +9,38 @@ description = "Next-generation Python AI CLI with parallel multi-agent visualiza
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-authors = [{ name = "nextcli contributors" }]
+authors = [
+    { name = "nextcli contributors" },
+]
+keywords = [
+    "ai",
+    "cli",
+    "agent",
+    "multi-agent",
+    "anthropic",
+    "openai",
+    "textual",
+    "tui",
+    "coding-assistant",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Environment :: Console :: Curses",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Software Development :: User Interfaces",
+    "Topic :: Terminals",
+    "Typing :: Typed",
+]
 
 dependencies = [
     "textual>=0.60",
@@ -24,13 +55,30 @@ dependencies = [
 dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.23",
+    "build>=1.2",
+    "twine>=5.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/<your-username>/nextcli"
+Repository = "https://github.com/<your-username>/nextcli"
+Issues = "https://github.com/<your-username>/nextcli/issues"
+Changelog = "https://github.com/<your-username>/nextcli/blob/main/CHANGELOG.md"
 
 [project.scripts]
 nextcli = "nextcli.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/nextcli"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/nextcli",
+    "README.md",
+    "README-zh-CN.md",
+    "LICENSE",
+    "requirements*.txt",
+]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
