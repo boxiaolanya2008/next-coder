@@ -1,0 +1,142 @@
+/* nextcli TUI - modern minimal dark theme */
+
+Screen {
+    background: #0d1117;
+    color: #c9d1d9;
+}
+
+/* Top bar: brand + stats */
+#title {
+    dock: top;
+    height: 1;
+    background: #010409;
+    color: #58a6ff;
+    text-style: bold;
+    padding: 0 1;
+}
+
+/* Bottom input bar */
+#input_row {
+    dock: bottom;
+    height: 3;
+    background: #010409;
+    border-top: solid #21262d;
+}
+
+#prompt_mark {
+    width: 2;
+    height: 100%;
+    color: #58a6ff;
+    text-style: bold;
+    content-align: right middle;
+}
+
+InputBar {
+    background: #010409;
+    height: 100%;
+    border: none;
+    width: 1fr;
+}
+
+#send_btn {
+    height: 3;
+    min-width: 10;
+    margin: 0 0 0 1;
+}
+
+InputBar > .input--placeholder {
+    color: #6e7681;
+}
+
+/* Main layout: 2 columns on wide terminals, 1 column on narrow */
+#main_grid {
+    layout: grid;
+    grid-size: 2 2;
+    grid-columns: 1fr 2fr;
+    grid-rows: 1fr 1fr;
+    height: 1fr;
+    padding: 0 1;
+}
+
+/* Generic panel chrome */
+AgentBoard, ChatLog, ToolTrace {
+    border: round #21262d;
+    background: #0d1117;
+    padding: 0 1;
+}
+
+ChatLog {
+    row-span: 2;
+}
+
+AgentBoard:focus, ChatLog:focus, ToolTrace:focus {
+    border: round #30363d;
+}
+
+/* Section title: left bar + uppercase */
+.section-title {
+    color: #8b949e;
+    text-style: bold;
+}
+
+/* Per-agent role colors (inline text) */
+.role-planner    { color: #d2a8ff; }
+.role-explorer   { color: #79c0ff; }
+.role-impl       { color: #56d364; }
+.role-reviewer   { color: #ffa657; }
+.role-user       { color: #f0f6fc; }
+.role-system     { color: #6e7681; }
+
+/* State indicators */
+.state-starting  { color: #d29922; }
+.state-thinking  { color: #58a6ff; }
+.state-tooling   { color: #ffa657; }
+.state-done      { color: #56d364; }
+.state-error     { color: #f85149; text-style: bold; }
+.state-cancelled { color: #6e7681; }
+
+/* Status pill row */
+StatusPill {
+    height: 1;
+    padding: 0 1;
+}
+
+StatusPill:hover {
+    background: #161b22;
+}
+
+/* ToolTrace rows */
+.trace-row {
+    height: auto;
+    padding: 0 1;
+}
+
+.trace-ok    { color: #56d364; }
+.trace-err   { color: #f85149; }
+.trace-spawn { color: #d2a8ff; }
+
+/* Command palette */
+#palette {
+    dock: bottom;
+    height: auto;
+    max-height: 12;
+    margin: 0 1 0 1;
+    background: #161b22;
+    border: round #30363d;
+    padding: 0 1;
+    display: none;
+}
+#palette.active {
+    display: block;
+}
+.cmd-row {
+    height: 1;
+    padding: 0 1;
+}
+.cmd-row.selected {
+    background: #1f6feb;
+}
+.cmd-empty {
+    color: #6e7681;
+    padding: 1 1;
+}

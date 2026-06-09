@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nextcli"
+version = "0.1.0"
+description = "Next-generation Python AI CLI with parallel multi-agent visualization"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "nextcli contributors" }]
+
+dependencies = [
+    "textual>=0.60",
+    "rich>=13.7",
+    "anthropic>=0.39",
+    "openai>=1.40",
+    "httpx>=0.27",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+]
+
+[project.scripts]
+nextcli = "nextcli.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nextcli"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
